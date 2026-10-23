@@ -79,7 +79,7 @@
 }
 
 @utility text-gradient {
-  @apply bg-gradient-to-b from-white via-white to-gold bg-clip-text font-semibold text-transparent;
+  @apply bg-gradient-to-b from-white via-white to-gold bg-clip-text font-semibold text-transparent bg-no-repeat bg-cover;
 }
 
 @utility glass {

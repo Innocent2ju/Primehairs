@@ -1,5 +1,6 @@
-import Image from "next/image";
 import { wigs } from "@/lib/constants";
+import ProductCard from "@/app/components/ProductCard";
+import TestBtn from "./components/testbtn";
 
 const Page = () => {
   return (
@@ -14,26 +15,10 @@ const Page = () => {
 
         <div className="products-grid">
           {wigs.map((wig) => (
-            <div key={wig.id} id="product-card">
-              <Image
-                src={wig.image}
-                alt={wig.name}
-                width={400}
-                height={300}
-                className="poster"
-              />
-              <h4 className="title">{wig.name}</h4>
-              <p>{wig.category}</p>
-              <div className="price-stock">
-                <span className="text-gold font-semibold">
-                  ${wig.price.toFixed(2)}
-                </span>
-                <span className="pill">
-                  {wig.inStock ? "In Stock" : "Sold Out"}
-                </span>
-              </div>
-            </div>
+            <ProductCard key={wig.id} wig={wig} />
           ))}
+
+          <TestBtn />
         </div>
       </div>
     </section>
