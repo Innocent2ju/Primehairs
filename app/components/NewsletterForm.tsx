@@ -4,7 +4,9 @@ export default function NewsletterForm() {
   return (
     <form
       className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-      onSubmit={(e) => e.preventDefault()}
+      onSubmit={(event) => {
+        event.preventDefault();
+      }}
     >
       <input
         type="email"
