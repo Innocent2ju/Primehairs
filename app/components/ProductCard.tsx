@@ -3,12 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import posthog from "posthog-js";
-import { Wig } from "@/lib/constants";
+import { StorefrontProduct } from "@/lib/data/products";
 
-export default function ProductCard({ wig }: { wig: Wig }) {
+interface ProductCardProps {
+  product?: StorefrontProduct;
+  wig?: StorefrontProduct;
+}
+
+export default function ProductCard({ product, wig }: ProductCardProps) {
+  const item = (product ?? wig)!;
+  if (!item) return null;
+
   return (
     <Link
-      href={`/products/${wig.slug}`}
+      href={`/products/${item.slug}`}
       id="product-card"
       onClick={() => {
         if (
@@ -16,30 +24,30 @@ export default function ProductCard({ wig }: { wig: Wig }) {
           process.env.NEXT_PUBLIC_POSTHOG_HOST
         ) {
           posthog.capture("product_card_selected", {
-            product_id: wig.id,
-            product_slug: wig.slug,
-            product_category: wig.category,
-            product_price: wig.price,
-            in_stock: wig.inStock,
+            product_id: item.id,
+            product_slug: item.slug,
+            product_category: item.category,
+            product_price: item.price,
+            in_stock: item.inStock,
           });
         }
       }}
     >
       <Image
-        src={wig.image}
-        alt={wig.name}
+        src={item.image}
+        alt={item.name}
         width={400}
         height={300}
         className="poster"
       />
-      <h4 className="title">{wig.name}</h4>
-      <p>{wig.category}</p>
+      <h4 className="title">{item.name}</h4>
+      <p>{item.category}</p>
       <div className="price-stock">
         <span className="text-gold font-semibold">
-          ${wig.price.toFixed(2)}
+          ${item.price.toFixed(2)}
         </span>
-        <span className="pill">
-          {wig.inStock ? "In Stock" : "Sold Out"}
+        <span className={`pill ${!item.inStock ? "opacity-70" : ""}`}>
+          {item.derivedStock ? item.derivedStock.label : item.inStock ? "In Stock" : "Sold Out"}
         </span>
       </div>
     </Link>

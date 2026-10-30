@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 const Navbar = () => {
     return (
@@ -21,4 +20,4 @@ const Navbar = () => {
     )
 }
 
-export default Navbar
+export default Navbar;

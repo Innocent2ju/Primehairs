@@ -1,6 +1,11 @@
 {
     "permissions": {
         "allow": [
+      "Bash(pnpm build)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm typecheck)",
+      "Bash(git status)",
+      "Bash(git diff *)"
 
         ],
         "ask": [
@@ -9,8 +14,8 @@
         "deny" : [
             "Read(.env)",
             "Read (.env.*)",
-            "edit (.env)",
-            "edit (.env.*)"  
+            "Edit (.env)",
+            "Edit (.env.*)"  
         ]
     },
 

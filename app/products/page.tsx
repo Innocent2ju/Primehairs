@@ -1,13 +1,37 @@
-import Navbar from "../components/Navbar";
+import { getCategoriesWithFoldedProducts } from "@/lib/data/products";
+import ProductCard from "@/app/components/ProductCard";
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const foldedCategories = await getCategoriesWithFoldedProducts();
+  const totalProducts = foldedCategories.reduce(
+    (acc, cat) => acc + cat.products.length,
+    0
+  );
+
   return (
-    <>
-      <Navbar />
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">All Products</h1>
-        <p className="text-gray-500">Products will appear here.</p>
-      </main>
-    </>
+    <section>
+      <h1 className="text-center">All Products</h1>
+      <p className="text-center mt-4 text-light-gray text-sm">
+        {totalProducts} products across {foldedCategories.length} categories
+      </p>
+
+      {foldedCategories.map((cat) => (
+        <div key={cat.id} className="mt-14 space-y-6">
+          <div className="flex items-baseline justify-between">
+            <h3>{cat.name}</h3>
+            {cat.description && (
+              <p className="text-xs text-light-gray hidden sm:block">
+                {cat.description}
+              </p>
+            )}
+          </div>
+          <div className="products-grid">
+            {cat.products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }
