@@ -1,8 +1,10 @@
-import { wigs } from "@/lib/constants";
+import { getLatestProducts } from "@/lib/data/products";
 import ProductCard from "@/app/components/ProductCard";
-import TestBtn from "./components/testbtn";
+import Link from "next/link";
 
-const Page = () => {
+export default async function Page() {
+  const products = await getLatestProducts();
+
   return (
     <section>
       <h1 className="text-center">The Online Store for Hair Wigs & Bundles</h1>
@@ -11,18 +13,21 @@ const Page = () => {
       </p>
 
       <div className="mt-20 space-y-7">
-        <h3>Featured Products</h3>
+        <div className="flex items-center justify-between">
+          <h3>Featured Products</h3>
+          <Link href="/products">
+            <p className="text-sm text-light-gray hover:text-gold transition-colors">
+              View all products
+            </p>
+          </Link>
+        </div>
 
         <div className="products-grid">
-          {wigs.map((wig) => (
-            <ProductCard key={wig.id} wig={wig} />
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
-
-          <TestBtn />
         </div>
       </div>
     </section>
   );
-};
-
-export default Page;
+}
