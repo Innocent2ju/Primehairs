@@ -6,6 +6,7 @@ import {
   getProductBySlug,
   getAllProductSlugs,
 } from "@/lib/data/products";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export async function generateStaticParams() {
   return await getAllProductSlugs();
@@ -135,6 +136,10 @@ export default async function ProductPage({
               </span>
             </li>
           </ul>
+
+          <div className="pt-2">
+            <AddToCartButton product={product} />
+          </div>
         </div>
       </div>
     </section>

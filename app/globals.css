@@ -156,31 +156,31 @@
   }
 
   .products-grid {
-    @apply grid md:grid-cols-4 gap-6 sm:grid-cols-2 grid-cols-1;
+    @apply grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-6;
   }
 
   #product-card {
-    @apply flex flex-col gap-3;
+    @apply flex flex-col gap-1.5 sm:gap-3;
 
     .poster {
-      @apply h-[300px] w-full rounded-lg object-cover;
+      @apply h-[180px] w-full rounded-lg object-cover sm:h-[240px] md:h-[300px];
     }
 
     .title {
-      @apply text-[18px] font-semibold line-clamp-1 font-playfair text-white;
+      @apply text-sm font-semibold line-clamp-1 font-playfair text-white sm:text-base md:text-[18px];
     }
 
     p {
-      @apply text-light-gray text-sm font-light;
+      @apply text-light-gray text-xs font-light sm:text-sm;
     }
 
     .price-stock {
-      @apply flex flex-row justify-between items-center mt-1;
+      @apply flex flex-row justify-between items-center mt-0.5 sm:mt-1;
     }
   }
 
   .pill {
-    @apply bg-black text-gold border border-gold/30 text-xs rounded-full px-3 py-1 font-medium;
+    @apply bg-black text-gold border border-gold/30 text-[10px] rounded-full px-2 py-0.5 font-medium sm:text-xs sm:px-3 sm:py-1;
   }
 
   #book-event {
