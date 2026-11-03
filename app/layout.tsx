@@ -3,6 +3,7 @@ import { Schibsted_Grotesk,  Martian_Mono } from "next/font/google";
 import "./globals.css";
 import LightRays from '@/components/LightRays';
 import Navbar from '@/components/Navbar';
+import { CartProvider } from '@/components/CartProvider';
 
 const schibstedGrotesk = Schibsted_Grotesk({
   variable: "--font-schibsted-grotesk",
@@ -26,8 +27,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${schibstedGrotesk.variable} ${martianMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col">
-      <Navbar />
-      <div className="absolute z-[-1] min-h-screen inset-0 top-0 ">
+        <CartProvider>
+          <Navbar />
+          <div className="absolute z-[-1] min-h-screen inset-0 top-0 ">
 
   <LightRays
     raysOrigin="top-center"
@@ -55,11 +57,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     lightMode={false}
 />
 </div>
-      <main>
-        {children}
-      </main>
-
-
+          <main>
+            {children}
+          </main>
+        </CartProvider>
       </body>
     </html>
   );

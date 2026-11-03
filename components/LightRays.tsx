@@ -359,9 +359,9 @@ const LightRays = ({
     maxRatio: clamp(maxDevicePixelRatio, 0.5, 3)
   };
   const settingsRef = useRef(settings);
-  settingsRef.current = settings;
 
   useEffect(() => {
+    settingsRef.current = settings;
     wakeRef.current?.();
   });
 

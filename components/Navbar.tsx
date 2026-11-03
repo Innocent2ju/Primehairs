@@ -1,23 +1,30 @@
 import Link from "next/link";
+import CartDropdown from "./CartDropdown";
+import NavbarSearch from "./NavbarSearch";
 
 const Navbar = () => {
-    return (
-        <header>
-            <nav>
-                <Link href='/' className="logo">
-                    {/* <Image src="/icons/logo.png" alt="logo" width={24} height={24} /> */}
+  return (
+    <header>
+      <nav>
+        <Link href="/" className="logo">
+          {/* <Image src="/icons/logo.png" alt="logo" width={24} height={24} /> */}
 
-                    <p>Prime Hairs</p>
-                </Link>
+          <p>Prime Hairs</p>
+        </Link>
 
-                <ul>
-                    <Link href="/">Home</Link>
-                    <Link href="/">Events</Link>
-                    <Link href="/">Create Event</Link>
-                </ul>
-            </nav>
-        </header>
-    )
-}
+        <ul>
+          <Link href="/">Home</Link>
+          <Link href="/products">Shop</Link>
+          <li>
+            <NavbarSearch />
+          </li>
+          <li>
+            <CartDropdown />
+          </li>
+        </ul>
+      </nav>
+    </header>
+  );
+};
 
 export default Navbar;
