@@ -8,8 +8,15 @@ import {
   boolean,
   timestamp,
   index,
+  uniqueIndex,
+  uuid,
+  check,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
+import { user } from "./auth-schema";
+
+export * from "./auth-schema";
 
 // 1. Categories Table
 export const categories = pgTable("categories", {
@@ -88,8 +95,81 @@ export const stocks = pgTable(
   (table) => [
     index("stocks_product_id_idx").on(table.productId),
     index("stocks_status_idx").on(table.status),
+    check("stocks_quantity_non_negative", sql`${table.quantity} >= 0`),
   ]
 );
+
+// 5. Orders Table (one per checkout attempt, owned by the signed-in customer)
+export const ORDER_STATUSES = [
+  "pending",
+  "paid",
+  "payment_failed",
+  "expired",
+  "cancelled",
+  "needs_review",
+] as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export const orderStatus = pgEnum("order_status", ORDER_STATUSES);
+
+export const orders = pgTable(
+  "orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "restrict" }),
+    status: orderStatus("status").notNull().default("pending"),
+    currency: varchar("currency", { length: 3 }).notNull().default("usd"),
+    totalCents: integer("total_cents").notNull(),
+    stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+    stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("orders_user_id_idx").on(table.userId),
+    index("orders_status_expires_at_idx").on(table.status, table.expiresAt),
+    check("orders_total_cents_positive", sql`${table.totalCents} > 0`),
+    check("orders_currency_lowercase", sql`${table.currency} ~ '^[a-z]{3}$'`),
+  ]
+);
+
+// 6. Order Items Table (name and price are snapshots taken at checkout)
+export const orderItems = pgTable(
+  "order_items",
+  {
+    id: serial("id").primaryKey(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "restrict" }),
+    productName: varchar("product_name", { length: 255 }).notNull(),
+    unitPriceCents: integer("unit_price_cents").notNull(),
+    quantity: integer("quantity").notNull(),
+  },
+  (table) => [
+    uniqueIndex("order_items_order_product_uq").on(table.orderId, table.productId),
+    index("order_items_product_id_idx").on(table.productId),
+    check("order_items_quantity_positive", sql`${table.quantity} > 0`),
+    check("order_items_unit_price_cents_positive", sql`${table.unitPriceCents} > 0`),
+  ]
+);
+
+// 7. Stripe Events Table (processed webhook event IDs, for idempotency)
+export const stripeEvents = pgTable("stripe_events", {
+  id: text("id").primaryKey(),
+  type: text("type").notNull(),
+  processedAt: timestamp("processed_at", { withTimezone: true }).defaultNow().notNull(),
+});
 
 // --- Drizzle Relations ---
 
@@ -119,6 +199,29 @@ export const productImagesRelations = relations(productImages, ({ one }) => ({
 export const stocksRelations = relations(stocks, ({ one }) => ({
   product: one(products, {
     fields: [stocks.productId],
+    references: [products.id],
+  }),
+}));
+
+export const userOrdersRelations = relations(user, ({ many }) => ({
+  orders: many(orders),
+}));
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  user: one(user, {
+    fields: [orders.userId],
+    references: [user.id],
+  }),
+  items: many(orderItems),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderItems.orderId],
+    references: [orders.id],
+  }),
+  product: one(products, {
+    fields: [orderItems.productId],
     references: [products.id],
   }),
 }));

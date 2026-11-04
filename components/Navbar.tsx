@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import CartDropdown from "./CartDropdown";
 import NavbarSearch from "./NavbarSearch";
+import AccountNav from "./auth/AccountNav";
 
 const Navbar = () => {
   return (
@@ -20,6 +22,11 @@ const Navbar = () => {
           </li>
           <li>
             <CartDropdown />
+          </li>
+          <li>
+            <Suspense>
+              <AccountNav />
+            </Suspense>
           </li>
         </ul>
       </nav>

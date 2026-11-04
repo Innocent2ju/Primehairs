@@ -3,13 +3,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { ShoppingBag, X, Plus, Minus, Trash2 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { ROUTES, withRedirect } from "@/lib/routes";
 import { useCart } from "./CartProvider";
 import ProceedToCheckoutButton from "./ProceedToCheckoutButton";
 
 export default function CartDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const pathname = usePathname();
   const {
     items,
     totalItems,
@@ -55,6 +60,21 @@ export default function CartDropdown() {
   }, [isOpen]);
 
   const displayCount = isHydrated ? totalItems : 0;
+
+  // Browsing and the cart are open to everyone; checkout requires an account.
+  async function handleCheckout() {
+    setIsOpen(false);
+
+    const { data: session } = await authClient.getSession();
+    if (!session) {
+      router.push(withRedirect(ROUTES.signIn, pathname));
+      return;
+    }
+
+    alert(
+      `Proceeding to checkout with ${totalItems} items ($${totalPrice.toFixed(2)})`
+    );
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -233,14 +253,7 @@ export default function CartDropdown() {
               <ProceedToCheckoutButton
                 totalPrice={totalPrice}
                 disabled={items.length === 0}
-                onCheckout={() => {
-                  setIsOpen(false);
-                  alert(
-                    `Proceeding to checkout with ${totalItems} items ($${totalPrice.toFixed(
-                      2
-                    )})`
-                  );
-                }}
+                onCheckout={handleCheckout}
               />
             </div>
           )}
