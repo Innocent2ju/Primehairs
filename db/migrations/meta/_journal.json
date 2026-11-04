@@ -8,6 +8,20 @@
       "when": 1793363151244,
       "tag": "0000_remarkable_cargill",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793790892651,
+      "tag": "0001_empty_quicksilver",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793802154760,
+      "tag": "0002_checkout_orders",
+      "breakpoints": true
     }
   ]
 }

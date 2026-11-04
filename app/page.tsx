@@ -13,20 +13,21 @@ export default async function Page() {
       </p>
 
       <div className="mt-20 space-y-7">
-        <div className="flex items-center justify-between">
           <h3>Featured Products</h3>
-          <Link href="/products">
-            <p className="text-sm text-light-gray hover:text-gold transition-colors">
-              View all products
-            </p>
-          </Link>
-        </div>
+          
 
         <div className="products-grid">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
+
+        <Link href="/products">
+            <p className="text-sm text-light-gray hover:text-gold transition-colors text-center">
+              View all products
+            </p>
+          </Link>
+
       </div>
     </section>
   );

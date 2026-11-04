@@ -72,9 +72,9 @@ export default function NavbarSearch() {
             setQuery(e.target.value);
             setIsOpen(true);
           }}
-          placeholder="Search wigs..."
-          aria-label="Search wigs"
-          className="w-28 sm:w-44 md:w-56 pl-7 sm:pl-8 pr-6 py-1 bg-black/60 text-white placeholder-light-gray/40 rounded-full border border-gold/30 focus:border-gold focus:w-40 md:focus:w-64 focus:outline-none text-xs transition-all"
+          placeholder="Search hairs..."
+          aria-label="Search hairs"
+          className="w-28 sm:w-44 md:w-56 pl-7 sm:pl-8 pr-6 py-1 bg-black/60 text-white placeholder-light-gray/40 rounded-full border border-[#1A1A1A]/40 focus:border-gold focus:w-40 md:focus:w-64 focus:outline-none text-xs transition-all"
         />
         <Search className="w-3.5 h-3.5 text-gold absolute left-2 pointer-events-none" />
 
@@ -103,7 +103,7 @@ export default function NavbarSearch() {
         <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 md:w-96 rounded-xl bg-[#1A1A1A]/95 border border-gold/30 backdrop-blur-xl shadow-2xl z-50 overflow-hidden divide-y divide-white/10">
           <div className="p-3">
             <div className="flex items-center justify-between text-xs text-light-gray mb-2">
-              <span>Matching Wigs</span>
+              <span>Matching hairs</span>
               <span className="text-[10px] text-gold font-medium">
                 {results.length} found
               </span>
