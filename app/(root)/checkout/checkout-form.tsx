@@ -20,6 +20,7 @@ import {
   type DeliveryType,
 } from "@/lib/delivery-settings";
 import { cn } from "@/lib/utils";
+import posthog from "posthog-js";
 
 const ATTRIBUTE_LABELS: Record<ProductAttribute, string> = {
   hairType: "Hair Type",
@@ -169,6 +170,17 @@ const CheckoutForm = ({ settings }: CheckoutFormProps) => {
           payload?.message ?? "Could not start the payment. Please try again.",
         );
         return;
+      }
+
+      if (
+        process.env.NEXT_PUBLIC_POSTHOG_KEY &&
+        process.env.NEXT_PUBLIC_POSTHOG_HOST
+      ) {
+        posthog.capture("payment_initiated", {
+          item_count: totalItems,
+          total_amount: total,
+          delivery_type: deliveryType,
+        });
       }
 
       setAuthorizationUrl(payload.authorization_url);

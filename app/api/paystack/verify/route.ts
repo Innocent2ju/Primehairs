@@ -1,4 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+
+import { posthogLogsLogger, loggerProvider, SeverityNumber } from "@/instrumentation";
 
 import {
   finalizeTransaction,
@@ -41,6 +43,22 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const { checkout, metadata, alreadyProcessed } =
       await finalizeTransaction(transaction);
+
+    posthogLogsLogger?.emit({
+      body: "Payment verification completed",
+      severityNumber: SeverityNumber.INFO,
+      attributes: {
+        payment_provider: "paystack",
+        payment_status: "success",
+        already_processed: alreadyProcessed,
+        item_count: metadata.items.length,
+        amount_kobo: transaction.amount,
+      },
+    });
+
+    after(async () => {
+      await loggerProvider?.forceFlush().catch(() => undefined);
+    });
 
     return NextResponse.json({
       status: "success",
