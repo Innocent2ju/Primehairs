@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { MapPin, Package, Truck } from "lucide-react";
@@ -36,7 +37,28 @@ const orderBadge: Record<CustomerOrder["orderStatus"], string> = {
   cancelled: "border-red-400/30 bg-red-400/10 text-red-300",
 };
 
-export default async function MyProfilePage() {
+const ProfileFallback = () => (
+  <section className="mx-auto max-w-3xl px-4 py-16">
+    <header className="rounded-2xl border border-gold/20 bg-[#1A1A1A]/80 p-6 sm:p-8">
+      <p className="text-xs font-medium uppercase tracking-[0.35em] text-gold">
+        My Profile
+      </p>
+      <div className="mt-4 h-8 w-48 animate-pulse rounded bg-white/10" />
+      <div className="mt-3 h-4 w-56 animate-pulse rounded bg-white/10" />
+    </header>
+
+    <div className="mt-10 flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 px-6 py-16 text-center">
+      <p
+        role="status"
+        className="animate-pulse text-sm uppercase tracking-[0.3em] text-gold"
+      >
+        Loading your profile…
+      </p>
+    </div>
+  </section>
+);
+
+const AuthenticatedProfile = async () => {
   const { data } = await auth.getSession();
   const user = data?.user;
 
@@ -132,5 +154,15 @@ export default async function MyProfilePage() {
         )}
       </section>
     </section>
+  );
+};
+
+export default function MyProfilePage() {
+  // The session cookie is request data, so the authenticated UI streams in
+  // behind a Suspense boundary and the static shell can prerender.
+  return (
+    <Suspense fallback={<ProfileFallback />}>
+      <AuthenticatedProfile />
+    </Suspense>
   );
 }
