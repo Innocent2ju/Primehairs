@@ -6,11 +6,14 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 
 import type { ProductAttribute } from "@/database";
+import { authClient } from "@/lib/auth-client";
+import posthog from "posthog-js";
 
 export interface CartItem {
   lineKey: string;
@@ -48,6 +51,12 @@ interface CartContextValue {
 const STORAGE_KEY = "primehairs:cart:v1";
 const MIN_QUANTITY = 1;
 const MAX_QUANTITY = 99;
+
+const isPostHogConfigured = (): boolean =>
+  Boolean(
+    process.env.NEXT_PUBLIC_POSTHOG_KEY &&
+      process.env.NEXT_PUBLIC_POSTHOG_HOST,
+  );
 
 const CartContext = createContext<CartContextValue | null>(null);
 
@@ -106,6 +115,37 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const identifiedUserId = useRef<string | null>(null);
+  const { data: session } = authClient.useSession();
+
+  useEffect(() => {
+    if (
+      !process.env.NEXT_PUBLIC_POSTHOG_KEY ||
+      !process.env.NEXT_PUBLIC_POSTHOG_HOST
+    ) {
+      return;
+    }
+
+    const authUser = session?.user;
+
+    if (!authUser) {
+      if (session === null && identifiedUserId.current) {
+        posthog.reset();
+        identifiedUserId.current = null;
+      }
+      return;
+    }
+
+    if (identifiedUserId.current === authUser.id) return;
+
+    if (identifiedUserId.current) posthog.reset();
+
+    posthog.identify(authUser.id, {
+      email: authUser.email,
+      name: authUser.name,
+    });
+    identifiedUserId.current = authUser.id;
+  }, [session]);
 
   useEffect(() => {
     try {
@@ -151,6 +191,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         ? input.unitPrice
         : 0;
 
+    if (isPostHogConfigured()) {
+      posthog.capture("cart_item_added", {
+        product_id: input.productId,
+        quantity,
+        unit_price: unitPrice,
+        selected_attribute_count: Object.keys(selectedAttributes).length,
+      });
+    }
+
     setItems((current) => {
       const index = current.findIndex((item) => item.lineKey === lineKey);
 
@@ -179,18 +228,36 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const removeItem = useCallback((lineKey: string) => {
+    const item = items.find((current) => current.lineKey === lineKey);
+
+    if (item && isPostHogConfigured()) {
+      posthog.capture("cart_item_removed", {
+        product_id: item.productId,
+        quantity: item.quantity,
+      });
+    }
+
     setItems((current) => current.filter((item) => item.lineKey !== lineKey));
-  }, []);
+  }, [items]);
 
   const updateQuantity = useCallback((lineKey: string, quantity: number) => {
     const nextQuantity = clampQuantity(quantity);
+    const item = items.find((current) => current.lineKey === lineKey);
+
+    if (item && isPostHogConfigured() && item.quantity !== nextQuantity) {
+      posthog.capture("cart_quantity_updated", {
+        product_id: item.productId,
+        previous_quantity: item.quantity,
+        quantity: nextQuantity,
+      });
+    }
 
     setItems((current) =>
       current.map((item) =>
         item.lineKey === lineKey ? { ...item, quantity: nextQuantity } : item,
       ),
     );
-  }, []);
+  }, [items]);
 
   const clearCart = useCallback(() => setItems([]), []);
 

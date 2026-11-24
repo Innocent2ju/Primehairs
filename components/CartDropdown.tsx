@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import posthog from "posthog-js";
 
 import { useCart } from "@/context/cart-context";
 import type { ProductAttribute } from "@/database";
@@ -48,6 +49,16 @@ const CartDropdown = () => {
   const router = useRouter();
 
   const handleCheckout = () => {
+    if (
+      process.env.NEXT_PUBLIC_POSTHOG_KEY &&
+      process.env.NEXT_PUBLIC_POSTHOG_HOST
+    ) {
+      posthog.capture("checkout_started", {
+        item_count: totalItems,
+        cart_subtotal: subtotal,
+      });
+    }
+
     closeCart();
     router.push("/checkout");
   };

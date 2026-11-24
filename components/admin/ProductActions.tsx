@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { Loader2, Pencil, Trash2 } from "lucide-react";
 
 import Link from "next/link";
+import posthog from "posthog-js";
 
 import { useAdminToast } from "@/components/admin/AdminToast";
 import { deleteProduct } from "@/lib/admin/actions/product";
@@ -33,6 +34,13 @@ export default function ProductActions({
       }
 
       if (result.status !== "success") return;
+
+      if (
+        process.env.NEXT_PUBLIC_POSTHOG_KEY &&
+        process.env.NEXT_PUBLIC_POSTHOG_HOST
+      ) {
+        posthog.capture("admin_product_deleted", { product_id: productId });
+      }
 
       setIsConfirming(false);
       toast.show(result.message, "success");

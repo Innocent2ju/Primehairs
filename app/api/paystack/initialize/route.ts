@@ -1,5 +1,7 @@
 import { inArray, or } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+
+import { posthogLogsLogger, loggerProvider, SeverityNumber } from "@/instrumentation";
 
 import {
   products,
@@ -277,6 +279,21 @@ export async function POST(request: Request): Promise<NextResponse> {
       amountKobo,
       callbackUrl: `${baseUrl}/checkout/callback`,
       metadata,
+    });
+
+    posthogLogsLogger?.emit({
+      body: "Payment authorization initialized",
+      severityNumber: SeverityNumber.INFO,
+      attributes: {
+        payment_provider: "paystack",
+        amount_kobo: amountKobo,
+        item_count: requested.length,
+        delivery_type: deliveryType,
+      },
+    });
+
+    after(async () => {
+      await loggerProvider?.forceFlush().catch(() => undefined);
     });
 
     return NextResponse.json({

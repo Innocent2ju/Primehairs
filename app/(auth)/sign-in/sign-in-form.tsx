@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
+
 import { authClient } from "@/lib/auth-client";
 
 const RESEND_COOLDOWN_SECONDS = 30;
@@ -106,6 +108,13 @@ export function SignInForm() {
     if (error) {
       setError(error.message ?? "That code is invalid or expired. Try again.");
       return;
+    }
+
+    if (
+      process.env.NEXT_PUBLIC_POSTHOG_KEY &&
+      process.env.NEXT_PUBLIC_POSTHOG_HOST
+    ) {
+      posthog.capture("sign_in_completed", { method: "email_otp" });
     }
 
     router.replace("/");

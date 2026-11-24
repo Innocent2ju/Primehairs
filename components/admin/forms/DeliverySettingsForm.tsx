@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { Loader2, Plus, Trash2 } from "lucide-react";
+import posthog from "posthog-js";
 
 import { useAdminToast } from "@/components/admin/AdminToast";
 import { updateDeliverySettings } from "@/lib/admin/actions/delivery";
@@ -63,6 +64,17 @@ export default function DeliverySettingsForm({
       if (result.status === "error") {
         toast.show(result.message, "error");
         return;
+      }
+
+      if (
+        process.env.NEXT_PUBLIC_POSTHOG_KEY &&
+        process.env.NEXT_PUBLIC_POSTHOG_HOST
+      ) {
+        posthog.capture("admin_delivery_settings_updated", {
+          branch_location_count: locations.filter((location) => location.trim()).length,
+          branch_pickup_fee: Number(branchFee),
+          doorstep_fee: Number(doorstepFee),
+        });
       }
 
       toast.show(result.message, "success");

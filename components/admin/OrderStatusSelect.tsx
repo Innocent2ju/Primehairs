@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
+import posthog from "posthog-js";
 
 import { useAdminToast } from "@/components/admin/AdminToast";
 import { updateOrderStatus } from "@/lib/admin/actions/order";
@@ -46,6 +47,16 @@ export default function OrderStatusSelect({
         setCurrent(previous);
         toast.show(result.message, "error");
         return;
+      }
+
+      if (
+        process.env.NEXT_PUBLIC_POSTHOG_KEY &&
+        process.env.NEXT_PUBLIC_POSTHOG_HOST
+      ) {
+        posthog.capture("admin_order_status_updated", {
+          previous_status: previous,
+          status: next,
+        });
       }
 
       toast.show(result.message, "success");
