@@ -27,7 +27,7 @@ const ProductGallery = ({ name, variants }: ProductGalleryProps) => {
             >
               <img
                 src={variant}
-                alt=""
+                alt={`${name} product photo ${index + 1}`}
                 className="aspect-square w-full object-cover"
               />
             </button>
@@ -39,7 +39,7 @@ const ProductGallery = ({ name, variants }: ProductGalleryProps) => {
       <div className="aspect-square w-full overflow-hidden rounded-xl border border-white/10 bg-charcoal card-shadow">
         <img
           src={activeImage}
-          alt={name}
+          alt={`${name} — selected product photo`}
           className="h-full w-full object-cover"
         />
       </div>
