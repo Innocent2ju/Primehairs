@@ -184,7 +184,6 @@ Email address
 ) : (
 <form onSubmit={handleVerify} className="space-y-5">
 <div className="space-y-2">
-<h2 className="text-xl text-foreground">Check your email</h2>
 <p className="text-sm leading-6 text-muted-foreground">
 We sent a 6-digit code to{" "}
 <span className="font-medium text-foreground">
@@ -194,10 +193,6 @@ We sent a 6-digit code to{" "}
 </p>
 </div>
 
-<div className="space-y-2">
-<p className="block text-sm font-medium text-foreground">
-One-time code
-</p>
 <div className="flex justify-center">
 <CodeSlots
  length={6}
@@ -225,7 +220,6 @@ One-time code
  ariaLabel="One-time code"
  disabled={isVerifying}
 />
-</div>
 </div>
 
 <button
