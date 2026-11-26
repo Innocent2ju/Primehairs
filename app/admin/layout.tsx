@@ -41,7 +41,7 @@ const AdminShell = async ({ children }: { children: React.ReactNode }) => {
 const AdminLoading = () => (
   <div className="flex min-h-screen items-center justify-center bg-black">
     <p className="animate-pulse text-sm uppercase tracking-[0.3em] text-gold">
-      Loading admin…
+     ...
     </p>
   </div>
 );

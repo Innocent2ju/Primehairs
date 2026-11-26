@@ -123,7 +123,7 @@ export default function ProductPurchaseBox({
   };
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 pb-24 lg:pb-0">
       
       {/* 1. DESKTOP PRICE AT THE TOP (Hidden on mobile) */}
       <div className="hidden lg:flex items-center justify-between py-3 border-b border-white/10">
@@ -131,21 +131,12 @@ export default function ProductPurchaseBox({
           <span className="text-xs uppercase tracking-wider text-gray-400 font-bold block mb-1">
             Price
           </span>
-          <p className="text-3xl sm:text-4xl font-extrabold text-amber-400 tracking-tight">
+          <p className="text-3xl sm:text-4xl font-bold text-amber-400 tracking-tight">
             {formatPrice(unitPriceCents * quantity)}
           </p>
         </div>
 
-        <div className="text-right">
-          {unitPriceCents !== basePriceCents && (
-            <span className="inline-block text-[11px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full font-medium mb-1">
-              Custom price active
-            </span>
-          )}
-          <p className="text-xs text-gray-400">
-            Unit: {formatPrice(unitPriceCents)}
-          </p>
-        </div>
+        
       </div>
 
       {/* 2. ATTRIBUTE DROPDOWNS (Short, compact pills in a 2-column grid) */}
@@ -156,7 +147,10 @@ export default function ProductPurchaseBox({
 
           return (
             <div key={key} className="flex flex-col gap-1">
-              <label htmlFor={key} className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+              <label
+                htmlFor={key}
+                className="text-[11px] font-bold uppercase tracking-wider text-gray-400"
+              >
                 {label}
               </label>
 
@@ -167,11 +161,19 @@ export default function ProductPurchaseBox({
                   onChange={(e) => handleSelectChange(key, e.target.value)}
                   className="w-full appearance-none rounded-lg border border-white/15 bg-neutral-900/90 px-2.5 py-1.5 text-xs text-white font-medium focus:border-amber-500 focus:outline-none transition-all cursor-pointer pr-7"
                 >
-                  <option value="" disabled className="bg-neutral-900 text-gray-400">
+                  <option
+                    value=""
+                    disabled
+                    className="bg-neutral-900 text-gray-400"
+                  >
                     Select {label}
                   </option>
                   {options.map((option) => (
-                    <option key={option} value={option} className="bg-neutral-900 text-white">
+                    <option
+                      key={option}
+                      value={option}
+                      className="bg-neutral-900 text-white"
+                    >
                       {option}
                     </option>
                   ))}
@@ -186,82 +188,81 @@ export default function ProductPurchaseBox({
         })}
       </div>
 
-      {/* 3. PRICE (Mobile Only) & QUANTITY/ADD TO CART AT THE BOTTOM */}
-      <div className="flex flex-col gap-3 pt-3 border-t border-white/10">
-        
-        {/* Mobile Price at the Bottom (Light, un-bulky, visible) */}
-        <div className="flex lg:hidden items-center justify-between px-1">
-          <span className="text-xs uppercase tracking-wider text-gray-400 font-medium">
-            Total Price
-          </span>
-          <span className="text-xl font-semibold text-amber-400 tracking-tight">
-            {formatPrice(unitPriceCents * quantity)}
-          </span>
-        </div>
-
-        {/* Quantity & Add to Cart Row */}
-        <div className="flex flex-row gap-2.5">
-          {/* Quantity Selector */}
-          <div className="flex items-center justify-between rounded-lg border border-white/15 p-1 w-28 sm:w-36 bg-neutral-900/50">
-            <button
-              type="button"
-              onClick={() =>
-                setQuantity((current) => Math.max(MIN_QUANTITY, current - 1))
-              }
-              disabled={quantity <= MIN_QUANTITY}
-              aria-label="Decrease quantity"
-              className="flex items-center justify-center size-8 cursor-pointer rounded text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              <Minus className="size-3.5" aria-hidden="true" />
-            </button>
-
-            <span
-              aria-live="polite"
-              className="text-sm font-bold text-white"
-            >
-              {quantity}
+      {/* 3. PRICE & QUANTITY / ADD TO CART (Fixed bottom bar on < lg, normal flow on lg+) */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/15 bg-neutral-950/95 px-4 py-3 backdrop-blur-md shadow-[0_-8px_24px_rgba(0,0,0,0.45)] lg:static lg:inset-auto lg:z-auto lg:border-t lg:border-white/10 lg:bg-transparent lg:px-0 lg:pt-3 lg:pb-0 lg:backdrop-blur-none lg:shadow-none">
+        <div className="mx-auto flex max-w-screen-xl flex-col gap-2.5 lg:max-w-none lg:gap-3">
+          {/* Mobile Price Row */}
+          <div className="flex lg:hidden items-center justify-between px-0.5">
+            <span className="text-[11px] uppercase tracking-wider text-gray-400 font-medium">
+              Total Price
             </span>
-
-            <button
-              type="button"
-              onClick={() =>
-                setQuantity((current) => Math.min(MAX_QUANTITY, current + 1))
-              }
-              disabled={quantity >= MAX_QUANTITY}
-              aria-label="Increase quantity"
-              className="flex items-center justify-center size-8 cursor-pointer rounded text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              <Plus className="size-3.5" aria-hidden="true" />
-            </button>
+            <span className="text-lg font-bold text-amber-400 tabular-nums tracking-tight">
+              {formatPrice(unitPriceCents * quantity)}
+            </span>
           </div>
 
-          {/* Add to Cart Button */}
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 cursor-pointer rounded-lg px-4 py-2.5 text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 focus:outline-none shadow-md",
-              isAdded
-                ? "bg-green-600 text-white"
-                : "bg-amber-400 text-black hover:bg-amber-300 active:scale-[0.98]"
-            )}
-          >
-            {isAdded ? (
-              <>
-                <Check className="size-4" aria-hidden="true" />
-                Added!
-              </>
-            ) : (
-              <>
-                <ShoppingBag className="size-4" aria-hidden="true" />
-                Add to Cart
-              </>
-            )}
-          </button>
+          {/* Quantity & Add to Cart Row */}
+          <div className="flex flex-row items-center justify-between gap-2.5">
+            {/* Quantity Selector */}
+            <div className="flex items-center justify-between rounded-lg border border-white/15 p-1 w-28 sm:w-36 bg-neutral-900/70">
+              <button
+                type="button"
+                onClick={() =>
+                  setQuantity((current) => Math.max(MIN_QUANTITY, current - 1))
+                }
+                disabled={quantity <= MIN_QUANTITY}
+                aria-label="Decrease quantity"
+                className="flex items-center justify-center size-8 cursor-pointer rounded text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                <Minus className="size-3.5" aria-hidden="true" />
+              </button>
+
+              <span
+                aria-live="polite"
+                className="text-sm font-bold text-white tabular-nums"
+              >
+                {quantity}
+              </span>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setQuantity((current) => Math.min(MAX_QUANTITY, current + 1))
+                }
+                disabled={quantity >= MAX_QUANTITY}
+                aria-label="Increase quantity"
+                className="flex items-center justify-center size-8 cursor-pointer rounded text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                <Plus className="size-3.5" aria-hidden="true" />
+              </button>
+            </div>
+
+            {/* Add to Cart Button */}
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className={cn(
+                "w-36 sm:w-44 lg:flex-1 flex items-center justify-center gap-2 cursor-pointer rounded-lg px-4 py-2.5 text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 focus:outline-none shadow-md",
+                isAdded
+                  ? "bg-green-600 text-white"
+                  : "bg-amber-400 text-black hover:bg-amber-300 active:scale-[0.98]",
+              )}
+            >
+              {isAdded ? (
+                <>
+                  <Check className="size-4" aria-hidden="true" />
+                  Added!
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="size-4" aria-hidden="true" />
+                  Add to Cart
+                </>
+              )}
+            </button>
+          </div>
         </div>
-
       </div>
-
     </div>
   );
 }

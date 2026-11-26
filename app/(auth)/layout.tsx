@@ -12,12 +12,7 @@ const AuthLayout = ({
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.16),transparent_55%)]"
       />
 
-      <Link
-        href="/"
-        className="absolute left-1/2 top-8 -translate-x-1/2 font-playfair text-xl font-bold italic tracking-wide text-gold"
-      >
-        Prime Hairs
-      </Link>
+  
 
       {children}
 
